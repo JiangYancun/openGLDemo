@@ -1,16 +1,18 @@
 ifeq ($(OS),Windows_NT)
 LDFLAGS=-lopengl32 -lglu32 -lglut32
 EXECUTABLE=main.exe
+BINDIR=bin/NT/
 else
 LDFLAGS=-lGL -lglut
 EXECUTABLE=main
+BINDIR=bin/Linux/
 endif
 
 CFLAGS=-g -DDEBUG
 
 all:
-	g++ main.cpp -c -o main.o $(CFLAGS) 
-	g++ main.o $(LDFLAGS) -o $(EXECUTABLE) 
+	g++ src/main.cpp -c -o $(BINDIR)main.o $(CFLAGS) 
+	g++ $(BINDIR)main.o $(LDFLAGS) -o $(BINDIR)$(EXECUTABLE) 
 
 clean:
 	rm main.o $(EXECUTABLE)
