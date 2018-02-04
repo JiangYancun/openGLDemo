@@ -1,128 +1,81 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#if defined(_WIN32) || defined(WIN32)
-#include <windows.h> 
-#endif
+#include <iostream>
 
-#include <GL/glut.h>
+// GLEW
+#define GLEW_STATIC
+#include <GL/glew.h>
 
-/*Code come from internet*/
-
-GLenum doubleBuffer;
-GLint thing1, thing2;
+// GLFW
+#include <GLFW/glfw3.h>
 
 
-static void Init(void)
+// Function prototypes
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+
+// Window dimensions
+const GLuint WIDTH = 400, HEIGHT = 400;
+
+// The MAIN function, from here we start the application and run the game loop
+int main()
 {
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClearAccum(0.0, 0.0, 0.0, 0.0);
+    std::cout << "Starting GLFW context, OpenGL 3.2" << std::endl;
+    // Init GLFW
+    glfwInit();
+    // Set all the required options for GLFW
+    //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	thing1 = glGenLists(1);
-	glNewList(thing1, GL_COMPILE);
-	glColor3f(1.0, 0.0, 0.0);
-	glRectf(-1.0, -1.0, 1.0, 0.0);
-	glEndList();
-
-	thing2 = glGenLists(1);
-	glNewList(thing2, GL_COMPILE);
-	glColor3f(0.0, 1.0, 0.0);
-	glRectf(0.0, -1.0, 1.0, 1.0);
-	glEndList();
-}
-
-static void Reshape(int width, int height)
-{
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
-static void Key(unsigned char key, int x, int y)
-{
-    switch (key)
-	{
-	case '1':
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glutPostRedisplay();
-		break;
-	case '2':
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glutPostRedisplay();
-		break;
-	case 27:
-		exit(0);
-	default:
-		return;
-	}
-}
-
-static void Draw(void)
-{
-	glPushMatrix();
-
-	glScalef(0.8, 0.8, 1.0);
-
-	glClear(GL_COLOR_BUFFER_BIT);
-	glCallList(thing1);
-	glAccum(GL_LOAD, 0.5);
-
-	glClear(GL_COLOR_BUFFER_BIT);
-	glCallList(thing2);
-	glAccum(GL_ACCUM, 0.5);
-
-	glAccum(GL_RETURN, 1.0);
-
-	glPopMatrix();
-
-	if (doubleBuffer)
-	{
-		glutSwapBuffers();
+    // Create a GLFWwindow object that we can use for GLFW's functions
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);    
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
     }
-	else
-	{
-		glFlush();
-	}
+    glfwMakeContextCurrent(window);
+    // Set the required callback functions
+    glfwSetKeyCallback(window, key_callback);
+
+    // Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
+    glewExperimental = GL_TRUE;
+    // Initialize GLEW to setup the OpenGL Function pointers
+    if (glewInit() != GLEW_OK)
+    {
+        std::cout << "Failed to initialize GLEW" << std::endl;
+        return -1;
+    }    
+
+    // Define the viewport dimensions
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);  
+    glViewport(0, 0, width, height);
+
+    // Game loop
+    while (!glfwWindowShouldClose(window))
+    {
+        // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
+        glfwPollEvents();
+
+        // Render
+        // Clear the colorbuffer
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // Swap the screen buffers
+        glfwSwapBuffers(window);
+    }
+
+    // Terminate GLFW, clearing any resources allocated by GLFW.
+    glfwTerminate();
+    return 0;
 }
 
-static void Args(int argc, char **argv)
+// Is called whenever a key is pressed/released via GLFW
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-	GLint i;
-
-	doubleBuffer = GL_FALSE;
-
-	for (i = 1; i < argc; i++) 
-	{
-		if (strcmp(argv[i], "-sb") == 0)
-		{
-			doubleBuffer = GL_FALSE;
-		} 
-		else if (strcmp(argv[i], "-db") == 0)
-		{
-			doubleBuffer = GL_TRUE;
-		}
-	}
-}
-
-int main(int argc, char **argv)
-{
-	GLenum type;
-
-	glutInit(&argc, argv);
-	Args(argc, argv);
-
-	type = GLUT_RGB | GLUT_ACCUM;
-	type |= (doubleBuffer) ? GLUT_DOUBLE : GLUT_SINGLE;
-	glutInitDisplayMode(type);
-	glutInitWindowSize(300, 300);
-	glutCreateWindow("Accum Test");
-
-	Init();
-
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Draw);
-	glutMainLoop();
+    std::cout << key << std::endl;
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
 }

@@ -3,7 +3,7 @@ LDFLAGS=-lopengl32 -lglu32 -lglut32
 EXECUTABLE=main.exe
 BINDIR=bin/NT/
 else
-LDFLAGS=-lGL -lglut
+LDFLAGS=-Wall -lglfw -lm -lGL -lGLU -lGLEW
 EXECUTABLE=main
 BINDIR=bin/Linux/
 endif
@@ -15,4 +15,4 @@ all:
 	g++ $(BINDIR)main.o $(LDFLAGS) -o $(BINDIR)$(EXECUTABLE) 
 
 clean:
-	rm main.o $(EXECUTABLE)
+	rm $(BINDIR)main.o $(BINDIR)$(EXECUTABLE)
