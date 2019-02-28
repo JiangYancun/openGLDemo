@@ -3,7 +3,7 @@ LDFLAGS=-lopengl32 -lglu32 -lglut32
 EXECUTABLE=main.exe
 BINDIR=bin/NT/
 else
-LDFLAGS=-Wall -lglfw -lm -lGL -lGLU -lGLEW
+LDFLAGS=-Wall -lglfw3 -lm -lGL -lGLU -lGLEW -lglut -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread -ldl 
 EXECUTABLE=main
 BINDIR=bin/Linux/
 endif
